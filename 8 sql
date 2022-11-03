@@ -1,0 +1,49 @@
+package utility;
+
+import java.sql.*;
+
+public class Connectionutility {
+	
+	public static Connection getconnection2() throws Exception
+	{
+		Connection con=null;
+		Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+		con=DriverManager.getConnection("jdbc:mysql://localhost/payroll2.0?user=root&password=root");
+		return con;
+		
+	}
+	
+	void PrintEmployee(String strQuery) throws Exception
+	{
+		Connection conn=null;
+		Statement stmt=null;
+		ResultSet rs=null;
+	
+	
+	try
+	{
+		conn=Connectionutility.getconnection2();
+		stmt=conn.createStatement();
+		rs=stmt.executeQuery(strQuery);
+		System.out.print("\n\nConnection Successful");
+		
+		while(rs.next())
+		{
+			
+			System.out.print("\nUserid :- "+rs.getString(1));
+			System.out.print("\tPassword :- "+rs.getString(2));
+		}
+		
+	}
+	catch(Exception e)
+	{
+		e.printStackTrace();
+	}
+	}
+	public static void main(String[] agrs) throws Exception
+	{
+		Connectionutility u=new Connectionutility();
+		String strQuery="select * from donor";
+		u.PrintEmployee(strQuery);
+	}
+}
