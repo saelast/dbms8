@@ -1,49 +1,96 @@
-package utility;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Scanner;
 
-import java.sql.*;
-
-public class Connectionutility {
-	
-	public static Connection getconnection2() throws Exception
+public class SQLConnection {
+	public static void main(String args[]) throws Exception
 	{
+		Scanner sn=new Scanner(System.in);
+		
 		Connection con=null;
 		Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-		con=DriverManager.getConnection("jdbc:mysql://localhost/payroll2.0?user=root&password=root");
-		return con;
+		con=DriverManager.getConnection("jdbc:mysql://localhost/retail?user=root&password=root");
+		System.out.print("\nConnection Successful\n");
 		
-	}
-	
-	void PrintEmployee(String strQuery) throws Exception
-	{
-		Connection conn=null;
-		Statement stmt=null;
-		ResultSet rs=null;
-	
-	
-	try
-	{
-		conn=Connectionutility.getconnection2();
-		stmt=conn.createStatement();
-		rs=stmt.executeQuery(strQuery);
-		System.out.print("\n\nConnection Successful");
+		String StrQuery="select * from retailinfo;";
+		String StrQuery1="insert into retailinfo values(?,?,?)";
+		String StrQuery2="delete from retailinfo where id=?";
+		String StrQuery3="update retailinfo set Name=?,Address=? where id=?";
 		
+		Statement stmt=con.createStatement();
+		ResultSet rs=stmt.executeQuery(StrQuery);
 		while(rs.next())
 		{
-			
-			System.out.print("\nUserid :- "+rs.getString(1));
-			System.out.print("\tPassword :- "+rs.getString(2));
+			System.out.print("\n\tId-"+rs.getInt(1)+"\tName-"+rs.getString(2)+"\tAddress-"+rs.getString(3));
 		}
 		
-	}
-	catch(Exception e)
-	{
-		e.printStackTrace();
-	}
-	}
-	public static void main(String[] agrs) throws Exception
-	{
-		Connectionutility u=new Connectionutility();
-		String strQuery="select * from donor";
-		u.PrintEmployee(strQuery);
+		System.out.print("\n\nWhich Operation You Want To Perform :");
+		System.out.print("\n1.Insert");
+		System.out.print("\n2.Update");
+		System.out.print("\n3.Delete");
+		
+		System.out.print("\nEnter Your Choice :");
+		int ch=sn.nextInt();
+		
+		if(ch==1)
+		{
+			PreparedStatement stmt1=con.prepareStatement(StrQuery1);
+			System.out.print("\nEnter Id:");
+			int id=sn.nextInt();
+			stmt1.setInt(1, id);
+			
+			System.out.print("\nEnter Name:");
+			String name=sn.next();
+			stmt1.setString(2,name);
+			
+			System.out.print("\nEnter Address:");
+			String address=sn.next();
+			stmt1.setString(3, address);
+			
+			stmt1.executeUpdate();
+			
+			System.out.print("Data Inserted Successfully");
+			
+			
+		}
+		else if(ch==2)
+		{
+			PreparedStatement stmt3=con.prepareStatement(StrQuery3);
+			
+			System.out.print("Enter Id Of Which to Update :");
+			int id=sn.nextInt();
+			stmt3.setInt(3, id);
+			
+			System.out.print("\nEnter Name:");
+			String name=sn.next();
+			stmt3.setString(1,name);
+			
+			System.out.print("\nEnter Address:");
+			String address=sn.next();
+			stmt3.setString(2, address);
+			
+			stmt3.executeUpdate();
+			
+			System.out.print("Data Updated Successfully");
+			
+		}
+		else if(ch==3)
+		{
+			PreparedStatement stmt2=con.prepareStatement(StrQuery2);
+			
+			System.out.print("Enter Id Of Which to Delete :");
+			int id=sn.nextInt();
+			stmt2.setInt(1, id);
+			stmt2.executeUpdate();
+			System.out.print("Data Deleted Successfully");
+		}
+		else
+		{
+			System.out.print("\nInvalid Choice");
+		}
+		
 	}
 }
